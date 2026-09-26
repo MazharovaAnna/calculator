@@ -1,0 +1,167 @@
+/* ===== Базовые сбросы и переменные ===== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg-page: #1e1e2e;
+  --bg-calc: #2a2a3c;
+  --bg-display: #1a1a28;
+  --bg-btn: #3a3a4e;
+  --bg-btn-hover: #4a4a62;
+  --bg-btn-active: #5a5a76;
+  --bg-operator: #ff9500;
+  --bg-operator-hover: #ffad33;
+  --bg-function: #5c5c78;
+  --bg-equals: #34c759;
+  --bg-equals-hover: #4dd96f;
+
+  --text-primary: #ffffff;
+  --text-secondary: #8a8aa0;
+
+  --radius-calc: 20px;
+  --radius-btn: 12px;
+
+  --font-main: "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+
+/* ===== Страница ===== */
+body {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: var(--bg-page);
+  font-family: var(--font-main);
+  color: var(--text-primary);
+  padding: 20px;
+}
+
+/* ===== Контейнер калькулятора ===== */
+.calculator {
+  width: 100%;
+  max-width: 360px;
+  background: var(--bg-calc);
+  border-radius: var(--radius-calc);
+  padding: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+/* ===== Экран ===== */
+.display {
+  background: var(--bg-display);
+  border-radius: var(--radius-btn);
+  padding: 20px 16px;
+  margin-bottom: 16px;
+  min-height: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-end;
+  overflow: hidden;
+}
+
+.display__history {
+  font-size: 16px;
+  color: var(--text-secondary);
+  min-height: 20px;
+  word-break: break-all;
+  text-align: right;
+  width: 100%;
+}
+
+.display__current {
+  font-size: 40px;
+  font-weight: 600;
+  line-height: 1.1;
+  word-break: break-all;
+  text-align: right;
+  width: 100%;
+}
+
+/* ===== Сетка кнопок ===== */
+.buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+/* ===== Базовая кнопка ===== */
+.btn {
+  border: none;
+  outline: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--text-primary);
+  background: var(--bg-btn);
+  border-radius: var(--radius-btn);
+  padding: 18px 0;
+  transition: background 0.15s ease, transform 0.05s ease;
+  user-select: none;
+}
+
+.btn:hover {
+  background: var(--bg-btn-hover);
+}
+
+.btn:active {
+  background: var(--bg-btn-active);
+  transform: scale(0.96);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--bg-operator);
+  outline-offset: 2px;
+}
+
+/* ===== Модификаторы ===== */
+.btn--operator {
+  background: var(--bg-operator);
+}
+
+.btn--operator:hover {
+  background: var(--bg-operator-hover);
+}
+
+.btn--function {
+  background: var(--bg-function);
+  font-size: 20px;
+}
+
+.btn--equals {
+  background: var(--bg-equals);
+}
+
+.btn--equals:hover {
+  background: var(--bg-equals-hover);
+}
+
+.btn--zero {
+  grid-column: span 2;
+}
+
+/* ===== Адаптив для маленьких экранов ===== */
+@media (max-width: 400px) {
+  .calculator {
+    padding: 14px;
+  }
+
+  .display__current {
+    font-size: 32px;
+  }
+
+  .btn {
+    font-size: 18px;
+    padding: 15px 0;
+  }
+
+  .buttons {
+    gap: 8px;
+  }
+}
