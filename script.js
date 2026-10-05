@@ -1,7 +1,10 @@
 // ===== 1. Ссылки на DOM =====
 const currentEl = document.getElementById("current");
 const historyEl = document.getElementById("history");
-const buttonsEl = document.getElementById("buttons");
+
+const historyPanelEl = document.getElementById("historyPanel");
+const historyListEl = document.getElementById("historyList");
+const historyBtn = document.getElementById("historyBtn");
 
 // ===== 2. Состояние =====
 const state = {
@@ -11,7 +14,11 @@ const state = {
   shouldResetScreen: false,
 };
 
-// ===== 3. Отрисовка =====
+// ===== 3. Константы истории =====
+const HISTORY_KEY = "calculator_history";
+const HISTORY_LIMIT = 20;
+
+// ===== 4. Отрисовка экрана =====
 function updateDisplay() {
   currentEl.textContent = state.currentInput;
   historyEl.textContent =
@@ -24,7 +31,7 @@ function prettyOperator(op) {
   return { "/": "÷", "*": "×", "-": "−", "+": "+" }[op] ?? op;
 }
 
-// ===== 4. Цифры =====
+// ===== 5. Цифры =====
 function appendNumber(number) {
   if (state.shouldResetScreen) {
     state.currentInput = number;
@@ -43,7 +50,7 @@ function appendNumber(number) {
   updateDisplay();
 }
 
-// ===== 5. Десятичная запятая =====
+// ===== 6. Десятичная запятая =====
 function appendDecimal() {
   if (state.shouldResetScreen) {
     state.currentInput = "0.";
@@ -58,18 +65,16 @@ function appendDecimal() {
   updateDisplay();
 }
 
-// ===== 6. Оператор =====
+// ===== 7. Оператор =====
 function chooseOperator(op) {
-  // Если пользователь уже выбрал оператор, но не ввёл второе число —
-  // просто меняем оператор (как в iOS: жмёшь "+", потом "×" — станет "×")
+  // Пользователь уже выбрал оператор, но не ввёл второе число — меняем оператор
   if (state.operator !== null && state.shouldResetScreen) {
     state.operator = op;
     updateDisplay();
     return;
   }
 
-  // Если уже есть previousInput и оператор — сначала посчитаем
-  // (цепочка "2 + 3 + ..." должна давать промежуточный результат 5)
+  // Уже есть previousInput и оператор — считаем промежуточный результат
   if (state.previousInput !== null && state.operator !== null) {
     calculate();
   }
@@ -80,9 +85,8 @@ function chooseOperator(op) {
   updateDisplay();
 }
 
-// ===== 7. Вычисление =====
+// ===== 8. Вычисление =====
 function calculate() {
-  // Нечего считать
   if (state.operator === null || state.previousInput === null) return;
 
   const a = parseFloat(state.previousInput);
@@ -108,23 +112,25 @@ function calculate() {
       return;
   }
 
-  // Округляем до 12 значащих цифр, убираем хвостовые нули
-  state.currentInput = formatResult(result);
+  const formatted = formatResult(result);
+  const expression = `${state.previousInput} ${prettyOperator(state.operator)} ${state.currentInput}`;
+
+  saveToHistory(expression, formatted);
+
+  state.currentInput = formatted;
   state.previousInput = null;
   state.operator = null;
   state.shouldResetScreen = true;
   updateDisplay();
 }
 
-// Красивое форматирование числа результата
+// Красивое форматирование результата
 function formatResult(num) {
   if (!isFinite(num)) return "Ошибка";
-  // toPrecision(12) убирает плавающие артефакты типа 0.1+0.2=0.30000000000000004
-  // parseFloat в конце срезает хвостовые нули: "12.30" -> 12.3
   return String(parseFloat(num.toPrecision(12)));
 }
 
-// ===== 8. Очистка =====
+// ===== 9. Очистка =====
 function clearAll() {
   state.currentInput = "0";
   state.previousInput = null;
@@ -133,12 +139,10 @@ function clearAll() {
   updateDisplay();
 }
 
-// ===== 9. Backspace =====
+// ===== 10. Backspace =====
 function backspace() {
-  // Если экран уже "сброшен" (только что нажали оператор или "=") — не трогаем
   if (state.shouldResetScreen) return;
 
-  // Стираем по одному символу
   if (state.currentInput.length > 1) {
     state.currentInput = state.currentInput.slice(0, -1);
   } else {
@@ -148,8 +152,95 @@ function backspace() {
   updateDisplay();
 }
 
-// ===== 10. Делегирование событий =====
-buttonsEl.addEventListener("click", (event) => {
+// ===== 11. История: чтение / запись =====
+function loadHistory() {
+  try {
+    const raw = localStorage.getItem(HISTORY_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveToHistory(expression, result) {
+  const history = loadHistory();
+  history.unshift({
+    expr: expression,
+    result: String(result),
+    time: Date.now(),
+  });
+
+  const trimmed = history.slice(0, HISTORY_LIMIT);
+
+  try {
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(trimmed));
+  } catch {
+    // localStorage переполнен или недоступен — молча игнорируем
+  }
+
+  if (!historyPanelEl.hidden) {
+    renderHistory();
+  }
+}
+
+// ===== 12. История: рендер =====
+function renderHistory() {
+  const history = loadHistory();
+  historyListEl.innerHTML = "";
+
+  if (history.length === 0) {
+    const empty = document.createElement("div");
+    empty.className = "history-panel__empty";
+    empty.textContent = "Пока пусто";
+    historyListEl.appendChild(empty);
+    return;
+  }
+
+  history.forEach((item) => {
+    const li = document.createElement("li");
+    li.className = "history-item";
+    li.title = "Нажми, чтобы подставить результат";
+
+    const expr = document.createElement("span");
+    expr.className = "history-item__expr";
+    expr.textContent = item.expr;
+
+    const result = document.createElement("span");
+    result.className = "history-item__result";
+    result.textContent = `= ${item.result}`;
+
+    li.append(expr, result);
+
+    li.addEventListener("click", () => {
+      state.currentInput = item.result;
+      state.shouldResetScreen = true;
+      updateDisplay();
+      closeHistory();
+    });
+
+    historyListEl.appendChild(li);
+  });
+}
+
+// ===== 13. История: очистка и открытие / закрытие =====
+function clearHistory() {
+  try {
+    localStorage.removeItem(HISTORY_KEY);
+  } catch {}
+  renderHistory();
+}
+
+function openHistory() {
+  renderHistory();
+  historyPanelEl.hidden = false;
+}
+
+function closeHistory() {
+  historyPanelEl.hidden = true;
+}
+
+// ===== 14. Делегирование событий =====
+document.addEventListener("click", (event) => {
   const btn = event.target.closest("button");
   if (!btn) return;
 
@@ -166,15 +257,18 @@ buttonsEl.addEventListener("click", (event) => {
   }
 
   switch (action) {
-    case "decimal":   appendDecimal(); break;
-    case "clear":     clearAll();      break;
-    case "backspace": backspace();     break;
-    case "equals":    calculate();     break;
+    case "decimal":        appendDecimal();  break;
+    case "clear":          clearAll();       break;
+    case "backspace":      backspace();      break;
+    case "equals":         calculate();      break;
+    case "history":        openHistory();    break;
+    case "close-history":  closeHistory();   break;
+    case "clear-history":  clearHistory();   break;
     case "percent":
     case "paren":
       break;
   }
 });
 
-// ===== 11. Первая отрисовка =====
+// ===== 15. Первая отрисовка =====
 updateDisplay();
