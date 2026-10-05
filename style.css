@@ -1,4 +1,4 @@
-/* ===== Сбросы и переменные ===== */
+/* ===== Сбросы ===== */
 *,
 *::before,
 *::after {
@@ -7,21 +7,56 @@
   padding: 0;
 }
 
+/* ===== Общие переменные (не зависят от темы) ===== */
 :root {
+  --accent-equals: #2f8f7a;
+  --accent-equals-hover: #37a88f;
+  --accent-equals-active: #267a67;
+  --accent-danger: #ff5a5a;
+
+  --font-main: -apple-system, "SF Pro Display", "Segoe UI",
+               system-ui, sans-serif;
+}
+
+/* ===== Тёмная тема (по умолчанию) ===== */
+:root,
+body.theme-dark {
   --bg: #000000;
   --bg-btn: #1c1c1e;
   --bg-btn-hover: #2c2c2e;
   --bg-btn-active: #3a3a3c;
-
-  --accent-equals: #2f8f7a;      /* бирюзовое "=" */
-  --accent-equals-hover: #37a88f;
-  --accent-danger: #ff5a5a;      /* красный C и ⌫ */
+  --bg-panel: rgba(0, 0, 0, 0.96);
+  --bg-icon-hover: rgba(255, 255, 255, 0.08);
 
   --text: #ffffff;
   --text-muted: #8e8e93;
 
-  --font-main: -apple-system, "SF Pro Display", "Segoe UI",
-               system-ui, sans-serif;
+  --history-scroll: #3a3a3c;
+}
+
+/* ===== Светлая тема ===== */
+body.theme-light {
+  --bg: #f5f5f7;
+  --bg-btn: #ffffff;
+  --bg-btn-hover: #ececef;
+  --bg-btn-active: #dcdce1;
+  --bg-panel: rgba(245, 245, 247, 0.97);
+  --bg-icon-hover: rgba(0, 0, 0, 0.06);
+
+  --text: #111114;
+  --text-muted: #8a8a90;
+
+  --history-scroll: #c9c9ce;
+}
+
+/* ===== Плавная смена темы ===== */
+body,
+.icon-btn,
+.display,
+.history-panel,
+.history-item,
+.calculator {
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 /* ===== Страница ===== */
@@ -39,6 +74,7 @@ body {
 
 /* ===== Калькулятор ===== */
 .calculator {
+  position: relative;
   width: 100%;
   max-width: 420px;
   display: flex;
@@ -70,12 +106,19 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.15s ease;
+  transition: background 0.15s ease, color 0.25s ease;
 }
 
 .icon-btn:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--bg-icon-hover);
 }
+
+/* ===== Иконки переключателя темы ===== */
+#themeBtn .icon-moon { display: none; }
+#themeBtn .icon-sun  { display: block; }
+
+body.theme-light #themeBtn .icon-moon { display: block; }
+body.theme-light #themeBtn .icon-sun  { display: none;  }
 
 /* ===== Экран ===== */
 .display {
@@ -85,27 +128,28 @@ body {
   justify-content: flex-end;
   align-items: flex-end;
   padding: 0 8px 24px;
-  min-height: 120px;
+  min-height: 180px;
   overflow: hidden;
+  gap: 8px;
 }
 
-.display__history {
-  font-size: 16px;
-  color: var(--text-muted);
-  min-height: 20px;
-  word-break: break-all;
-  text-align: right;
+.display__expression {
+  font-size: 56px;
   font-weight: 300;
-}
-
-.display__current {
-  font-size: 64px;
-  font-weight: 300;
-  line-height: 1;
+  line-height: 1.05;
   letter-spacing: -1px;
   word-break: break-all;
   text-align: right;
   max-width: 100%;
+}
+
+.display__preview {
+  font-size: 26px;
+  font-weight: 300;
+  color: var(--text-muted);
+  min-height: 30px;
+  word-break: break-all;
+  text-align: right;
 }
 
 /* ===== Сетка кнопок ===== */
@@ -119,7 +163,7 @@ body {
 /* ===== Круглая кнопка ===== */
 .btn {
   width: 100%;
-  aspect-ratio: 1 / 1;          
+  aspect-ratio: 1 / 1;
   border: none;
   outline: none;
   cursor: pointer;
@@ -132,7 +176,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.15s ease, transform 0.06s ease;
+  transition: background 0.15s ease, transform 0.06s ease,
+              color 0.25s ease;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
 }
@@ -145,19 +190,16 @@ body {
   outline-offset: 2px;
 }
 
-/* Операторы (÷ × − +) 
 .btn--operator {
   font-size: 32px;
   font-weight: 300;
 }
 
-/* C и ⌫ */
 .btn--danger {
   color: var(--accent-danger);
   font-size: 26px;
 }
 
-/* Равно — бирюзовое, белый знак */
 .btn--equals {
   background: var(--accent-equals);
   color: #ffffff;
@@ -166,12 +208,112 @@ body {
 }
 
 .btn--equals:hover  { background: var(--accent-equals-hover); }
-.btn--equals:active { background: #267a67; }
+.btn--equals:active { background: var(--accent-equals-active); }
+
+/* ===== Панель истории ===== */
+.history-panel {
+  position: absolute;
+  inset: 0;
+  background: var(--bg-panel);
+  backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  z-index: 10;
+}
+
+.history-panel[hidden] {
+  display: none;
+}
+
+.history-panel__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.history-panel__title {
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.history-list {
+  list-style: none;
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-right: 4px;
+}
+
+.history-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.history-list::-webkit-scrollbar-thumb {
+  background: var(--history-scroll);
+  border-radius: 4px;
+}
+
+.history-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  padding: 10px 12px;
+  background: var(--bg-btn);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.25s ease;
+}
+
+.history-item:hover {
+  background: var(--bg-btn-hover);
+}
+
+.history-item__expr {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.history-item__result {
+  font-size: 22px;
+  font-weight: 400;
+  color: var(--text);
+}
+
+.history-panel__empty {
+  color: var(--text-muted);
+  font-size: 15px;
+  text-align: center;
+  margin-top: 40px;
+}
+
+.history-panel__clear {
+  margin-top: 16px;
+  background: transparent;
+  border: none;
+  color: var(--accent-danger);
+  font-family: inherit;
+  font-size: 16px;
+  padding: 12px;
+  cursor: pointer;
+  border-radius: 12px;
+  transition: background 0.15s ease;
+}
+
+.history-panel__clear:hover {
+  background: rgba(255, 90, 90, 0.1);
+}
 
 /* ===== Адаптив ===== */
 @media (max-width: 400px) {
   .calculator { padding: 10px 12px 20px; }
-  .display__current { font-size: 52px; }
+  .display__expression { font-size: 42px; }
+  .display__preview    { font-size: 20px; }
   .btn { font-size: 24px; }
   .btn--operator { font-size: 28px; }
   .btn--equals   { font-size: 28px; }
@@ -182,7 +324,6 @@ body {
   .calculator {
     max-width: 380px;
     margin: auto;
-    height: auto;
   }
   body { align-items: center; }
 }

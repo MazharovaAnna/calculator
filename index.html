@@ -4,14 +4,34 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Калькулятор</title>
+
+  <!-- Инлайн-скрипт: применяем тему до отрисовки, чтобы не мигало -->
+  <script>
+    (function () {
+      try {
+        const saved = localStorage.getItem("calculator_theme");
+        const theme = (saved === "dark" || saved === "light")
+          ? saved
+          : (window.matchMedia &&
+             window.matchMedia("(prefers-color-scheme: light)").matches
+              ? "light"
+              : "dark");
+        document.addEventListener("DOMContentLoaded", function () {
+          document.body.classList.add("theme-" + theme);
+        });
+      } catch {}
+    })();
+  </script>
+
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
   <main class="calculator">
+
     <!-- Верхняя панель с иконками -->
     <div class="topbar">
-      <button class="icon-btn" data-action="history" aria-label="История">
+      <button class="icon-btn" id="historyBtn" data-action="history" aria-label="История">
         <svg viewBox="0 0 24 24" width="22" height="22" fill="none"
              stroke="currentColor" stroke-width="1.8"
              stroke-linecap="round" stroke-linejoin="round">
@@ -22,6 +42,24 @@
       </button>
 
       <div class="topbar__right">
+        <button class="icon-btn" id="themeBtn" data-action="toggle-theme"
+                aria-label="Переключить тему">
+          <!-- Солнце — показываем в тёмной теме -->
+          <svg class="icon-sun" viewBox="0 0 24 24" width="22" height="22" fill="none"
+               stroke="currentColor" stroke-width="1.8"
+               stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="4"/>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41
+                     M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+          </svg>
+          <!-- Луна — показываем в светлой теме -->
+          <svg class="icon-moon" viewBox="0 0 24 24" width="22" height="22" fill="none"
+               stroke="currentColor" stroke-width="1.8"
+               stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>
+          </svg>
+        </button>
+
         <button class="icon-btn" data-action="ruler" aria-label="Линейка">
           <svg viewBox="0 0 24 24" width="22" height="22" fill="none"
                stroke="currentColor" stroke-width="1.8"
@@ -43,17 +81,37 @@
       </div>
     </div>
 
+    <!-- Панель истории -->
+    <div class="history-panel" id="historyPanel" hidden>
+      <div class="history-panel__header">
+        <span class="history-panel__title">История</span>
+        <button class="icon-btn" data-action="close-history" aria-label="Закрыть">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none"
+               stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 6l12 12M18 6 6 18"/>
+          </svg>
+        </button>
+      </div>
+
+      <ul class="history-list" id="historyList"></ul>
+
+      <button class="history-panel__clear" data-action="clear-history">
+        Очистить историю
+      </button>
+    </div>
+
     <!-- Экран -->
     <div class="display">
-      <div class="display__history" id="history"></div>
-      <div class="display__current" id="current">0</div>
+      <div class="display__expression" id="expression">0</div>
+      <div class="display__preview" id="preview"></div>
     </div>
 
     <!-- Кнопки -->
     <div class="buttons" id="buttons">
-      <button class="btn btn--danger"  data-action="clear">C</button>
-      <button class="btn btn--danger"  data-action="backspace">⌫</button>
-      <button class="btn"              data-action="percent">%</button>
+      <button class="btn btn--danger"   data-action="clear">C</button>
+      <button class="btn btn--danger"   data-action="backspace">⌫</button>
+      <button class="btn"               data-action="percent">%</button>
       <button class="btn btn--operator" data-operator="/">÷</button>
 
       <button class="btn" data-number="7">7</button>
