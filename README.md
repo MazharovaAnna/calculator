@@ -4,7 +4,7 @@
 
 ## Демо
 
-[Открыть на GitHub Pages]()
+[Открыть на GitHub Pages](https://mazharovaanna.github.io/calculator/)
 
 ## Возможности
 
