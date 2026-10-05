@@ -1,4 +1,4 @@
-/* ===== Базовые сбросы и переменные ===== */
+/* ===== Сбросы и переменные ===== */
 *,
 *::before,
 *::after {
@@ -8,160 +8,181 @@
 }
 
 :root {
-  --bg-page: #1e1e2e;
-  --bg-calc: #2a2a3c;
-  --bg-display: #1a1a28;
-  --bg-btn: #3a3a4e;
-  --bg-btn-hover: #4a4a62;
-  --bg-btn-active: #5a5a76;
-  --bg-operator: #ff9500;
-  --bg-operator-hover: #ffad33;
-  --bg-function: #5c5c78;
-  --bg-equals: #34c759;
-  --bg-equals-hover: #4dd96f;
+  --bg: #000000;
+  --bg-btn: #1c1c1e;
+  --bg-btn-hover: #2c2c2e;
+  --bg-btn-active: #3a3a3c;
 
-  --text-primary: #ffffff;
-  --text-secondary: #8a8aa0;
+  --accent-equals: #2f8f7a;      /* бирюзовое "=" */
+  --accent-equals-hover: #37a88f;
+  --accent-danger: #ff5a5a;      /* красный C и ⌫ */
 
-  --radius-calc: 20px;
-  --radius-btn: 12px;
+  --text: #ffffff;
+  --text-muted: #8e8e93;
 
-  --font-main: "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-main: -apple-system, "SF Pro Display", "Segoe UI",
+               system-ui, sans-serif;
 }
 
 /* ===== Страница ===== */
 body {
   min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-main);
   display: flex;
   justify-content: center;
-  align-items: center;
-  background: var(--bg-page);
-  font-family: var(--font-main);
-  color: var(--text-primary);
-  padding: 20px;
+  align-items: stretch;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* ===== Контейнер калькулятора ===== */
+/* ===== Калькулятор ===== */
 .calculator {
   width: 100%;
-  max-width: 360px;
-  background: var(--bg-calc);
-  border-radius: var(--radius-calc);
-  padding: 20px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  padding: 16px 18px 28px;
+}
+
+/* ===== Верхняя панель ===== */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 4px 0;
+  margin-bottom: 8px;
+}
+
+.topbar__right {
+  display: flex;
+  gap: 8px;
+}
+
+.icon-btn {
+  background: transparent;
+  border: none;
+  color: var(--text);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease;
+}
+
+.icon-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
 }
 
 /* ===== Экран ===== */
 .display {
-  background: var(--bg-display);
-  border-radius: var(--radius-btn);
-  padding: 20px 16px;
-  margin-bottom: 16px;
-  min-height: 100px;
+  flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: flex-end;
+  padding: 0 8px 24px;
+  min-height: 120px;
   overflow: hidden;
 }
 
 .display__history {
   font-size: 16px;
-  color: var(--text-secondary);
+  color: var(--text-muted);
   min-height: 20px;
   word-break: break-all;
   text-align: right;
-  width: 100%;
+  font-weight: 300;
 }
 
 .display__current {
-  font-size: 40px;
-  font-weight: 600;
-  line-height: 1.1;
+  font-size: 64px;
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -1px;
   word-break: break-all;
   text-align: right;
-  width: 100%;
+  max-width: 100%;
 }
 
 /* ===== Сетка кнопок ===== */
 .buttons {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
+  gap: 12px;
+  justify-items: center;
 }
 
-/* ===== Базовая кнопка ===== */
+/* ===== Круглая кнопка ===== */
 .btn {
+  width: 100%;
+  aspect-ratio: 1 / 1;          
   border: none;
   outline: none;
   cursor: pointer;
-  font-family: inherit;
-  font-size: 22px;
-  font-weight: 500;
-  color: var(--text-primary);
+  border-radius: 50%;
   background: var(--bg-btn);
-  border-radius: var(--radius-btn);
-  padding: 18px 0;
-  transition: background 0.15s ease, transform 0.05s ease;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 28px;
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease, transform 0.06s ease;
   user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.btn:hover {
-  background: var(--bg-btn-hover);
-}
-
-.btn:active {
-  background: var(--bg-btn-active);
-  transform: scale(0.96);
-}
+.btn:hover  { background: var(--bg-btn-hover); }
+.btn:active { background: var(--bg-btn-active); transform: scale(0.94); }
 
 .btn:focus-visible {
-  outline: 2px solid var(--bg-operator);
+  outline: 2px solid var(--accent-equals);
   outline-offset: 2px;
 }
 
-/* ===== Модификаторы ===== */
+/* Операторы (÷ × − +) 
 .btn--operator {
-  background: var(--bg-operator);
+  font-size: 32px;
+  font-weight: 300;
 }
 
-.btn--operator:hover {
-  background: var(--bg-operator-hover);
+/* C и ⌫ */
+.btn--danger {
+  color: var(--accent-danger);
+  font-size: 26px;
 }
 
-.btn--function {
-  background: var(--bg-function);
-  font-size: 20px;
-}
-
+/* Равно — бирюзовое, белый знак */
 .btn--equals {
-  background: var(--bg-equals);
+  background: var(--accent-equals);
+  color: #ffffff;
+  font-size: 32px;
+  font-weight: 500;
 }
 
-.btn--equals:hover {
-  background: var(--bg-equals-hover);
-}
+.btn--equals:hover  { background: var(--accent-equals-hover); }
+.btn--equals:active { background: #267a67; }
 
-.btn--zero {
-  grid-column: span 2;
-}
-
-/* ===== Адаптив для маленьких экранов ===== */
+/* ===== Адаптив ===== */
 @media (max-width: 400px) {
+  .calculator { padding: 10px 12px 20px; }
+  .display__current { font-size: 52px; }
+  .btn { font-size: 24px; }
+  .btn--operator { font-size: 28px; }
+  .btn--equals   { font-size: 28px; }
+  .buttons { gap: 10px; }
+}
+
+@media (min-width: 700px) {
   .calculator {
-    padding: 14px;
+    max-width: 380px;
+    margin: auto;
+    height: auto;
   }
-
-  .display__current {
-    font-size: 32px;
-  }
-
-  .btn {
-    font-size: 18px;
-    padding: 15px 0;
-  }
-
-  .buttons {
-    gap: 8px;
-  }
+  body { align-items: center; }
 }

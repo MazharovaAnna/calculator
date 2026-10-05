@@ -9,6 +9,40 @@
 <body>
 
   <main class="calculator">
+    <!-- Верхняя панель с иконками -->
+    <div class="topbar">
+      <button class="icon-btn" data-action="history" aria-label="История">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none"
+             stroke="currentColor" stroke-width="1.8"
+             stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 12a9 9 0 1 0 3-6.7"/>
+          <path d="M3 4v4h4"/>
+          <path d="M12 8v4l3 2"/>
+        </svg>
+      </button>
+
+      <div class="topbar__right">
+        <button class="icon-btn" data-action="ruler" aria-label="Линейка">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none"
+               stroke="currentColor" stroke-width="1.8"
+               stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 15 15 3l6 6L9 21z"/>
+            <path d="m7 11 2 2"/>
+            <path d="m10 8 2 2"/>
+            <path d="m13 5 2 2"/>
+          </svg>
+        </button>
+        <button class="icon-btn" data-action="sqrt" aria-label="Корень">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none"
+               stroke="currentColor" stroke-width="1.8"
+               stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 12h3l3 8 4-16h6"/>
+            <path d="M17 12h4"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
     <!-- Экран -->
     <div class="display">
       <div class="display__history" id="history"></div>
@@ -17,9 +51,9 @@
 
     <!-- Кнопки -->
     <div class="buttons" id="buttons">
-      <button class="btn btn--function" data-action="clear">C</button>
-      <button class="btn btn--function" data-action="backspace">←</button>
-      <button class="btn btn--function" data-action="percent">%</button>
+      <button class="btn btn--danger"  data-action="clear">C</button>
+      <button class="btn btn--danger"  data-action="backspace">⌫</button>
+      <button class="btn"              data-action="percent">%</button>
       <button class="btn btn--operator" data-operator="/">÷</button>
 
       <button class="btn" data-number="7">7</button>
@@ -37,8 +71,9 @@
       <button class="btn" data-number="3">3</button>
       <button class="btn btn--operator" data-operator="+">+</button>
 
-      <button class="btn btn--zero" data-number="0">0</button>
-      <button class="btn" data-action="decimal">.</button>
+      <button class="btn" data-action="paren">( )</button>
+      <button class="btn" data-number="0">0</button>
+      <button class="btn" data-action="decimal">,</button>
       <button class="btn btn--equals" data-action="equals">=</button>
     </div>
   </main>
